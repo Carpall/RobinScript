@@ -12,7 +12,7 @@ class Test
             Instruction.New(Runtime.Load, "tird"),
             Instruction.New(Runtime.NewObj, "vec"), // instantiate a new vector
             Instruction.New(Runtime.Load, "index here"), // index to load
-            Instruction.New(Runtime.CallInstance, "get(&.)"), // get element from index
+            Instruction.New(Runtime.CallInstance, "get(.)"), // get element from index
                                                               // &: instance, .: first argument
             Instruction.New(Runtime.RvmOutput), // output the element
             Instruction.New(Runtime.Return)

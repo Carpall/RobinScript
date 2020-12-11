@@ -77,7 +77,7 @@ namespace RobinVM.Models
                         { "msg", null },
                         { "code", null },
                         { "type", null },
-                        { "throw(&)",
+                        { "throw()",
                             Function.New
                             (
                                 new Instruction[]
@@ -106,7 +106,7 @@ namespace RobinVM.Models
                     {
                         { "$", "sys::vec" },
                         { "arr", null },
-                        { "len(&)",
+                        { "len()",
                             Function.New
                             (
                                 new Instruction[]
@@ -116,7 +116,7 @@ namespace RobinVM.Models
                                 }
                             )
                         },
-                        { "get(&.)",
+                        { "get(.)",
                             Function.New
                             (
                                 new Instruction[]
@@ -126,7 +126,7 @@ namespace RobinVM.Models
                                 }
                             )
                         },
-                        { "set(&..)",
+                        { "set(..)",
                             Function.New
                             (
                                 new Instruction[]
@@ -136,7 +136,7 @@ namespace RobinVM.Models
                                 }
                             )
                         },
-                        { "clear(&)",
+                        { "clear()",
                             Function.New
                             (
                                 new Instruction[]
@@ -146,7 +146,7 @@ namespace RobinVM.Models
                                 }
                             )
                         },
-                        { "find(&.)",
+                        { "find(.)",
                             Function.New
                             (
                                 new Instruction[]
@@ -156,7 +156,7 @@ namespace RobinVM.Models
                                 }
                             )
                         },
-                        { "clone(&)",
+                        { "clone()",
                             Function.New
                             (
                                 new Instruction[]
@@ -166,7 +166,7 @@ namespace RobinVM.Models
                                 }
                             )
                         },
-                        { "getstr(&)",
+                        { "getstr()",
                             Function.New
                             (
                                 new Instruction[]
