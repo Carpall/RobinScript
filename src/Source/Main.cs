@@ -1,14 +1,5 @@
 ﻿using RobinVM;
 using RobinVM.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-
-class FunctionBuilder
-{
-    
-}
 
 class Test
 {
@@ -16,6 +7,14 @@ class Test
     {
         var main = Function.New
         (
+            Instruction.New(Runtime.Load, "first"), // load vector elements
+            Instruction.New(Runtime.Load, "second"),
+            Instruction.New(Runtime.Load, "tird"),
+            Instruction.New(Runtime.NewObj, "vec"), // instantiate a new vector
+            Instruction.New(Runtime.Load, "index here"), // index to load
+            Instruction.New(Runtime.CallInstance, "get(&.)"), // get element from index
+                                                              // &: instance, .: first argument
+            Instruction.New(Runtime.RvmOutput), // output the element
             Instruction.New(Runtime.Return)
         );
 

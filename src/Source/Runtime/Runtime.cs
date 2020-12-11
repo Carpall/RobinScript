@@ -13,13 +13,13 @@ namespace RobinVM
         public static int ProgramCounter = 0;
         public static Image RuntimeImage;
         public static Function CurrentFunctionPointer;
-        public static readonly RStack Stack = new RStack(16);
+        public static readonly RStack Stack = new RStack(600000);
 
         /// <summary>
-        /// Matches if stack peek type is the same of T
+        /// Matches if stack peek type is the same of <typeparamref name="T"/>
         /// </summary>
         /// <param name="args"></param>
-        public static void CastToInt<T>(object args) => Stack.Push(Stack.Peek() is T);
+        public static void MatchType<T>(object args) => Stack.Push(Stack.Peek() is T);
 
         /// <summary>
         /// Casts last element onto the stack to int32 and pushes result
@@ -94,7 +94,7 @@ namespace RobinVM
         public static void CallInstance(object args)
         {
             var p = Stack.PrePeek<CacheTable>();
-            ((Function)p[(string)args]).ExecuteLabel("ins "+p["$"]+":" + (string)args);
+            ((p[(string)args]).Cast<Function>()).ExecuteLabel("ins "+p["$"]+":" + (string)args);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace RobinVM
         /// Loads onto the stack a global variable
         /// </summary>
         /// <param name="args">Global variable id</param>
-        public static void LoadGlobal(object args) => Stack.Push(((CacheTable)Stack.Pop())[(string)args]);
+        public static void LoadGlobal(object args) => Stack.Push(Stack.Pop<CacheTable>()[(string)args]);
 
         /// <summary>
         /// Loads onto the stack a function argument
@@ -140,9 +140,9 @@ namespace RobinVM
         /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
         public static void StoreElementIntoArray(object args)
         {
-            var p = (int)Stack.Pop();
+            var p = Stack.Pop<int>();
             var val = Stack.Pop();
-            var arr = (object[])Stack.Pop();
+            var arr = Stack.Pop<object[]>();
             arr[p] = val;
             Stack.Push(arr);
         }
@@ -154,8 +154,8 @@ namespace RobinVM
         /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
         public static void LoadElementFromArray(object args)
         {
-            var p = (int)Stack.Pop();
-            Stack.Push(((object[])Stack.Pop())[p]);
+            var p = Stack.Pop<int>();
+            Stack.Push((Stack.Pop<object[]>())[p]);
         }
 
         /// <summary>
@@ -195,19 +195,13 @@ namespace RobinVM
         /// Closes try-panic environment
         /// </summary>
         /// <param name="args"></param>
-        public static void Finally(object args)
-        {
-            BasePanic.TryScopeTarget = null;
-        }
+        public static void Finally(object args) => BasePanic.TryScopeTarget = null;
 
         /// <summary>
         /// If try scope has not paniced, the program will jump to <paramref name="args"/>
         /// </summary>
         /// <param name="args"></param>
-        public static void OnPanic(object args)
-        {
-            BasePanic.TryScopeTarget = null;
-        }
+        public static void OnPanic(object args) => BasePanic.TryScopeTarget = null;
 
         /// <summary>
         /// Adds last element with second last and pushes it onto the stack
@@ -306,19 +300,19 @@ namespace RobinVM
         /// Calls shell using the last element onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void RvmShell(object args) => Process.Start(new ProcessStartInfo() { FileName = "cmd", Arguments = "/C " + Stack.Pop(), UseShellExecute = false });
+        public static void RvmShell(object args) => Process.Start(new ProcessStartInfo() { FileName = "cmd", Arguments = "/C " + Stack.Pop<string>(), UseShellExecute = false });
 
         /// <summary>
         /// Calls a built in rvm function reference stored onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void RvmCall(object args) => ((CallPointer)Stack.Pop())();
+        public static void RvmCall(object args) => Stack.Pop().Cast<CallPointer>()();
 
         /// <summary>
         /// Exits from the program and returns stack pop as code
         /// </summary>
         /// <param name="args"></param>
-        public static void RvmExit(object args) => Environment.Exit((int)Stack.Pop());
+        public static void RvmExit(object args) => Environment.Exit(Stack.Pop().Cast<int>());
 
         /// <summary>
         /// Throws a new exception with a string parameter as message
@@ -326,7 +320,7 @@ namespace RobinVM
         /// <param name="args"></param>
         public static void RvmThrow(object args)
         {
-            BasePanic.Throw((CacheTable)Stack.Pop(), "Runtime");
+            BasePanic.Throw(Stack.Pop().Cast<CacheTable>());
         }
 
         /// <summary>
@@ -405,7 +399,7 @@ namespace RobinVM
         /// <param name="args">Index of instruction to jump on</param>
         public static void JumpTrue(object args)
         {
-            if ((bool)Stack.Pop())
+            if (Stack.Pop().Cast<bool>())
                 ProgramCounter = (int)args - 1;
         }
 
@@ -415,7 +409,7 @@ namespace RobinVM
         /// <param name="args">Index of instruction to jump on</param>
         public static void JumpFalse(object args)
         {
-            if (!(bool)Stack.Pop())
+            if (!Stack.Pop().Cast<bool>())
                 ProgramCounter = (int)args - 1;
         }
 
@@ -425,7 +419,7 @@ namespace RobinVM
         /// <param name="args">Name of the label to jump on</param>
         public static void JumpTrueLabel(object args)
         {
-            if ((bool)Stack.Pop())
+            if (Stack.Pop().Cast<bool>())
                 ProgramCounter = CurrentFunctionPointer.FindLabel((string)args) - 1;
         }
 
@@ -435,7 +429,7 @@ namespace RobinVM
         /// <param name="args">Name of the label to jump on</param>
         public static void JumpFalseLabel(object args)
         {
-            if (!(bool)Stack.Pop())
+            if (!Stack.Pop().Cast<bool>())
                 ProgramCounter = CurrentFunctionPointer.FindLabel((string)args) - 1;
         }
 
@@ -455,7 +449,7 @@ namespace RobinVM
         /// <param name="args">Index of instruction to jump on</param>
         public static void SkipTrue(object args)
         {
-            if ((bool)Stack.Pop())
+            if (Stack.Pop().Cast<bool>())
                 ProgramCounter += (int)args;
         }
 
@@ -465,7 +459,7 @@ namespace RobinVM
         /// <param name="args">Index of instruction to jump on</param>
         public static void SkipFalse(object args)
         {
-            if (!(bool)Stack.Pop())
+            if (!Stack.Pop().Cast<bool>())
                 ProgramCounter += (int)args;
         }
 
@@ -475,7 +469,7 @@ namespace RobinVM
         /// <param name="args">Index of instruction to jump on</param>
         public static void BackTrue(object args)
         {
-            if ((bool)Stack.Pop())
+            if (Stack.Pop().Cast<bool>())
                 ProgramCounter -= (int)args;
         }
 
@@ -485,7 +479,7 @@ namespace RobinVM
         /// <param name="args">Index of instruction to jump on</param>
         public static void BackFalse(object args)
         {
-            if (!(bool)Stack.Pop())
+            if (!Stack.Pop().Cast<bool>())
                 ProgramCounter -= (int)args;
         }
 
