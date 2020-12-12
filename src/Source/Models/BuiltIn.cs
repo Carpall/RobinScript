@@ -78,7 +78,8 @@ namespace RobinVM.Models.BuiltIn
         }
         public static void SysStr_Concat(object nill = null)
         {
-            Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"].Cast<string>() + Runtime.CurrentFunctionPointer.FindArgument(1).Cast<CacheTable>()["ptr"].Cast<string>());
+        	Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"] = Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"].Cast<string>() + Runtime.CurrentFunctionPointer.FindArgument(1).Cast<CacheTable>()["ptr"].Cast<string>();
+            Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0));
         }
         public static void SysStr_ToString(object nill = null)
         {
@@ -104,7 +105,7 @@ namespace RobinVM.Models
         public void InitializeBuiltIn()
         {
             // Print
-            CacheTable.Add("print",
+            CacheTable.Add("print(.)",
                 Function.New(
                     Instruction.New(Runtime.LoadFromArgs, 0),
                     Instruction.New(Runtime.CallInstance, "tostr()"),
@@ -112,7 +113,7 @@ namespace RobinVM.Models
                     Instruction.New(Runtime.Return)
                 ));
 
-            CacheTable.Add("println",
+            CacheTable.Add("println(.)",
             Function.New(
                 Instruction.New(Runtime.LoadFromArgs, 0),
                 Instruction.New(Runtime.CallInstance, "tostr()"),
