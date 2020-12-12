@@ -14,12 +14,12 @@ namespace RobinVM.Models
         readonly public string ManifestName;
         readonly public Function EntryPointPointer;
 
-        readonly Dictionary<string, object> CacheTable;
+        readonly CacheTable CacheTable;
         public Image(string manifestName, ref Function entryPoint)
         {
             this.ManifestName = manifestName;
             this.EntryPointPointer = entryPoint;
-            this.CacheTable = new Dictionary<string, object>();
+            this.CacheTable = new CacheTable();
 
             AddFunction(manifestName, entryPoint);
         }
@@ -27,21 +27,21 @@ namespace RobinVM.Models
         {
             if (CacheTable.TryGetValue(id, out object value))
                 return (Function)value;
-            BasePanic.Throw($"Undifined function `{id}`", 24, "Runtime");
+            BasePanic.Throw($"Undefined function `{id}`", 24, "Runtime");
             return (Function)new object();
         }
         public Obj FindObj(string id)
         {
             if (CacheTable.TryGetValue(id, out object value))
                 return (Obj)value;
-            BasePanic.Throw($"Undifined obj `{id}`", 23, "Runtime");
+            BasePanic.Throw($"Undefined obj `{id}`", 23, "Runtime");
             return (Obj)new object();
         }
         public object FindGlobal(string id)
         {
             if (CacheTable.TryGetValue(id, out object value))
                 return (Function)value;
-            BasePanic.Throw($"Undifined global variable `{id}`", 22, "Runtime");
+            BasePanic.Throw($"Undefined global variable `{id}`", 22, "Runtime");
             return null;
         }
         public void AddFunction(string id, Function function)
@@ -53,8 +53,6 @@ namespace RobinVM.Models
         }
         public void AddObj(string id, Obj @object)
         {
-            if (@object.CacheTable == null)
-                BasePanic.Throw($"Obj `{id}` does not contain members", 25, "PreRuntime");
             @object.CacheTable.TryAdd("$", id);
             if (@object.Ctor == null)
                 BasePanic.Throw($"Obj `{id}` does not contain a definition for ctor function", 19, "PreRuntime");
@@ -67,7 +65,7 @@ namespace RobinVM.Models
                 BasePanic.Throw($"Already defined global variable `{id}`", 18, "Runtime");
         }
 
-        public Dictionary<string, object> GetCacheTable()
+        public CacheTable GetCacheTable()
         {
             return CacheTable;
         }

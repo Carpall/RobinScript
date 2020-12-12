@@ -2,7 +2,6 @@ using RobinVM.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using CacheTable = System.Collections.Generic.Dictionary<string, object>;
 namespace RobinVM
 {
     public static class Runtime
@@ -79,7 +78,7 @@ namespace RobinVM
         public static void StoreGlobal(object args)
         {
             var p = Stack.Pop();
-            Stack.Pop<CacheTable>()[(string)args] = p;
+            Stack.Pop<CacheTable>().Set((string)args, p);
         }
 
         /// <summary>

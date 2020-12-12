@@ -4,11 +4,8 @@ namespace RobinVM.Models
 {
     public struct Obj
     {
-        public Obj Copy()
-        {
-            return new Obj { CacheTable = new Dictionary<string, object>(CacheTable), Ctor = new Function(Ctor.Value.Instructions) };
-        }
-        public Dictionary<string, object> CacheTable;
+        public CacheTable CacheTable;
         public Function? Ctor;
+        public Obj Copy() => new Obj { CacheTable = CacheTable.Clone(), Ctor = Ctor.Value };
     }
 }

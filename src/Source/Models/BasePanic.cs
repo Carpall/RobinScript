@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace RobinVM.Models
 {
@@ -24,7 +23,7 @@ namespace RobinVM.Models
             Console.WriteLine("BasePanic[{2}: {3}]: {0}\nTrace:\n   at: {1}", error, Trace.Count == 0 ? "$(No Trace)" : string.Join("\n   in: ", Trace), state, code);
             Environment.Exit(code);
         }
-        public static void Throw(Dictionary<string, object> inner)
+        public static void Throw(CacheTable inner)
         {
             if (TryScopeTarget != null)
             {
