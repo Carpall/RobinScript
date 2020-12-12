@@ -1,5 +1,6 @@
 using RobinVM.Models;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using CacheTable = System.Collections.Generic.Dictionary<string, object>;
 namespace RobinVM
@@ -16,10 +17,10 @@ namespace RobinVM
         public static readonly RStack Stack = new RStack(600000);
 
         /// <summary>
-        /// Matches if stack peek type is the same of <typeparamref name="T"/>
+        /// Matches if stack pop type is the same of <typeparamref name="T"/>
         /// </summary>
         /// <param name="args"></param>
-        public static void MatchType<T>(object args) => Stack.Push(Stack.Peek() is T);
+        public static void MatchType<T>(object args) => Stack.Push(Stack.Pop() is T);
 
         /// <summary>
         /// Casts last element onto the stack to int32 and pushes result
@@ -108,11 +109,39 @@ namespace RobinVM
             ins.Ctor.Value.ExecuteLabel("ins "+(string)args+":ctor");
             Stack.Push(ins.CacheTable);
         }
+
         /// <summary>
-        /// Loads onto the stack a constant
+        /// Loads a new string instance with <paramref name="args"/> constant as value
         /// </summary>
-        /// <param name="args">Constant to load onto the stack</param>
-        public static void Load(object args) => Stack.Push(args);
+        /// <param name="args">String</param>
+        public static void LoadString(object args)
+        {
+            var ins = RuntimeImage.FindObj("str").Copy().CacheTable;
+            ins["ptr"] = args.Cast<string>();
+            Stack.Push(ins);
+        }
+
+        /// <summary>
+        /// Loads a new number instance with <paramref name="args"/> constant as value
+        /// </summary>
+        /// <param name="args">Int8-64, Float32-128</param>
+        public static void LoadNumber(object args)
+        {
+            var ins = RuntimeImage.FindObj("num").Copy().CacheTable;
+            ins["ptr"] = args.Cast<int>();
+            Stack.Push(ins);
+        }
+
+        /// <summary>
+        /// Loads a new list with all stack elements as start values
+        /// </summary>
+        /// <param name="args"></param>
+        public static void LoadVector(object args)
+        {
+            var ins = RuntimeImage.FindObj("vec").Copy().CacheTable;
+            ins["ptr"] = Stack.PopRangeAsList((int)args);
+            Stack.Push(ins);
+        }
 
         /// <summary>
         /// Loads onto the stack a global variable
@@ -129,34 +158,8 @@ namespace RobinVM
         /// <summary>
         /// Loads onto the stack the current runtime image
         /// </summary>
-        /// <param name="args">G-lobal variable id</param>
+        /// <param name="args"></param>
         public static void LoadRuntimeImage(object args) => Stack.Push(RuntimeImage.GetCacheTable());
-
-        /// <summary>
-        /// Takes last element on the stack as index, the second last as the new value to replace with and the tird last
-        /// as array to operate in
-        /// </summary>
-        /// <param name="args"></param>
-        /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
-        public static void StoreElementIntoArray(object args)
-        {
-            var p = Stack.Pop<int>();
-            var val = Stack.Pop();
-            var arr = Stack.Pop<object[]>();
-            arr[p] = val;
-            Stack.Push(arr);
-        }
-
-        /// <summary>
-        /// Takes last element on the stack as index of the element to push onto the stack, the second last as array
-        /// </summary>
-        /// <param name="args"></param>
-        /// <typeparam name="T">Type of array<br/>Example: int[] => StoreElementIntoArray&lt;int&gt;()</typeparam>
-        public static void LoadElementFromArray(object args)
-        {
-            var p = Stack.Pop<int>();
-            Stack.Push((Stack.Pop<object[]>())[p]);
-        }
 
         /// <summary>
         /// Clears stack
@@ -209,80 +212,26 @@ namespace RobinVM
         /// <param name="args"></param>
         public static void Add(object args)
         {
-            object p = Stack.Pop();
-            object p1 = Stack.Pop();
-            if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `Add` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 16, "Runtime");
-            if (p is string) Stack.Push((string)p1 + (string)p);
-            else if (p is byte) Stack.Push((byte)p1 + (byte)p);
-            else if (p is short) Stack.Push((short)p1 + (short)p);
-            else if (p is int) Stack.Push((int)p1 + (int)p);
-            else if (p is long) Stack.Push((long)p1 + (long)p);
-            else if (p is float) Stack.Push((float)p1 + (float)p);
-            else if (p is double) Stack.Push((double)p1 + (double)p);
-            else if (p is decimal) Stack.Push((decimal)p1 + (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Add` by type `" + p1.GetType() + "`", 15, "Runtime");
+            Stack.Peek<CacheTable>(1)["add(.)"].Cast<Function>().ExecuteLabel("add(.)");
         }
 
         /// <summary>
         /// Subs last element with second last and pushes it onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Sub(object args)
-        {
-            object p = Stack.Pop();
-            object p1 = Stack.Pop();
-            if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Unperformable operation `Sub` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 33, "Runtime");
-            if (p is byte) Stack.Push((byte)p1 - (byte)p);
-            else if (p is short) Stack.Push((short)p1 + (short)p);
-            else if (p is int) Stack.Push((int)p1 - (int)p);
-            else if (p is long) Stack.Push((long)p1 - (long)p);
-            else if (p is float) Stack.Push((float)p1 - (float)p);
-            else if (p is double) Stack.Push((double)p1 - (double)p);
-            else if (p is decimal) Stack.Push((decimal)p1 - (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Sub` by type `" + p1.GetType() + "`", 32, "Runtime");
-        }
+        public static void Sub(object args) => Stack.Peek<CacheTable>(1)["sub(.)"].Cast<Function>().ExecuteLabel("sub(.)");
 
         /// <summary>
         /// Divides last element with second last and pushes it onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Div(object args)
-        {
-            object p = Stack.Pop();
-            object p1 = Stack.Pop();
-            if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `Div` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 26, "Runtime");
-            if (p is byte) Stack.Push((byte)p1 / (byte)p);
-            else if (p is short) Stack.Push((short)p1 / (short)p);
-            else if (p is int) Stack.Push((int)p1 / (int)p);
-            else if (p is long) Stack.Push((long)p1 / (long)p);
-            else if (p is float) Stack.Push((float)p1 / (float)p);
-            else if (p is double) Stack.Push((double)p1 / (double)p);
-            else if (p is decimal) Stack.Push((decimal)p1 / (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Div` by type `" + p1.GetType() + "`", 27, "Runtime");
-        }
+        public static void Div(object args) => Stack.Peek<CacheTable>(1)["div(.)"].Cast<Function>().ExecuteLabel("div(.)");
 
         /// <summary>
         /// Multiplies last element with second last and pushes it onto the stack
         /// </summary>
         /// <param name="args"></param>
-        public static void Mul(object args)
-        {
-            object p = Stack.Pop();
-            object p1 = Stack.Pop();
-            if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `Mul` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 28, "Runtime");
-            if (p is byte) Stack.Push((byte)p1 * (byte)p);
-            else if (p is short) Stack.Push((short)p1 * (short)p);
-            else if (p is int) Stack.Push((int)p1 * (int)p);
-            else if (p is long) Stack.Push((long)p1 * (long)p);
-            else if (p is float) Stack.Push((float)p1 * (float)p);
-            else if (p is double) Stack.Push((double)p1 * (double)p);
-            else if (p is decimal) Stack.Push((decimal)p1 * (decimal)p);
-            else BasePanic.Throw("Unsupported operation `Mul` by type `" + p1.GetType() + "`", 29, "Runtime");
-        }
+        public static void Mul(object args) => Stack.Peek<CacheTable>(1)["mul(.)"].Cast<Function>().ExecuteLabel("mul(.)");
 
         /// <summary>
         /// Prints the last element onto the stack into the console
@@ -351,47 +300,19 @@ namespace RobinVM
         /// Compares last two elements onto the stack and pushes true if last is greater than second last or false
         /// </summary>
         /// <param name="args"></param>
-        public static void CompareGreater(object args)
-        {
-            object p = Stack.Pop();
-            object p1 = Stack.Pop();
-            if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `CompareGreater` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 28, "Runtime");
-            if (p is byte) Stack.Push((byte)p1 > (byte)p);
-            else if (p is short) Stack.Push((short)p1 > (short)p);
-            else if (p is int) Stack.Push((int)p1 > (int)p);
-            else if (p is long) Stack.Push((long)p1 > (long)p);
-            else if (p is float) Stack.Push((float)p1 > (float)p);
-            else if (p is double) Stack.Push((double)p1 > (double)p);
-            else if (p is decimal) Stack.Push((decimal)p1 > (decimal)p);
-            else BasePanic.Throw("Unsupported operation `CompareGreater` by type `" + p1.GetType() + "`", 29, "Runtime");
-        }
+        public static void CompareGreater(object args) => Stack.Peek<CacheTable>(1)["cmpgt()"].Cast<Function>().ExecuteLabel("cmpgt()");
 
         /// <summary>
         /// Compares last two elements onto the stack and pushes true if last is less than second last or false
         /// </summary>
         /// <param name="args"></param>
-        public static void CompareLess(object args)
-        {
-            object p = Stack.Pop();
-            object p1 = Stack.Pop();
-            if (p.GetType() != p1.GetType())
-                BasePanic.Throw("Tryed to perform operation `CompareLess` between types `" + p1.GetType() + "` & `" + p.GetType() + "`", 28, "Runtime");
-            if (p is byte) Stack.Push((byte)p1 < (byte)p);
-            else if (p is short) Stack.Push((short)p1 < (short)p);
-            else if (p is int) Stack.Push((int)p1 < (int)p);
-            else if (p is long) Stack.Push((long)p1 < (long)p);
-            else if (p is float) Stack.Push((float)p1 < (float)p);
-            else if (p is double) Stack.Push((double)p1 < (double)p);
-            else if (p is decimal) Stack.Push((decimal)p1 < (decimal)p);
-            else BasePanic.Throw("Unsupported operation `CompareLess` by type `" + p1.GetType() + "`", 29, "Runtime");
-        }
+        public static void CompareLess(object args) => Stack.Peek<CacheTable>(1)["cmpls()"].Cast<Function>().ExecuteLabel("cmpls()");
 
         /// <summary>
         /// Compares last two elements onto the stack and pushes true if are not equals or false
         /// </summary>
         /// <param name="args"></param>
-        public static void CompareNEQ(object args) => Stack.Push(!Stack.Pop().Equals(Stack.Pop()));
+        public static void CompareNEQ(object args) => Stack.Push(Stack.Pop() != Stack.Pop());
 
         /// <summary>
         /// Pops last element of the stack and jump to <paramref name="args"/> if true

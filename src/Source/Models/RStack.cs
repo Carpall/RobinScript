@@ -15,6 +15,12 @@ namespace RobinVM.Models
         {
             return VirtualStack.Count;
         }
+        public List<object> PopRangeAsList(int size)
+        {
+            var x = VirtualStack.GetRange(VirtualStack.Count - size, size);
+            VirtualStack.RemoveRange(VirtualStack.Count - size, size);
+            return x;
+        }
         public void TransferToArguments(ref Function function)
         {
             if (VirtualStack.Count != 0)
@@ -37,6 +43,13 @@ namespace RobinVM.Models
                 BasePanic.Throw("Tryed to pop element from empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 12, "Runtime");
             var x0 = VirtualStack[^1];
             VirtualStack.RemoveAt(VirtualStack.Count - 1);
+            return x0.Cast<T>();
+        }
+        public T Peek<T>(byte skip)
+        {
+            if (VirtualStack.Count < skip)
+                BasePanic.Throw("Tryed to peekskip element from short stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 12, "Runtime");
+            var x0 = VirtualStack[^skip];
             return x0.Cast<T>();
         }
         public T PrePop<T>()

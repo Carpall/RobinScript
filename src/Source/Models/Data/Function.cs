@@ -46,10 +46,6 @@ namespace RobinVM.Models
         {
             Arguments = arguments;
         }
-        public void LoadArgumentsAsList()
-        {
-            Runtime.Stack.Push(Arguments[1..^0].ToList());
-        }
         Dictionary<string, int> Labels;
         object[] Arguments;
         public Instruction[] Instructions;
