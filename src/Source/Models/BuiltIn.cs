@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RobinVM.Models.BuiltIn;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,6 +7,18 @@ namespace RobinVM.Models.BuiltIn
 {
     public static class Extensions
     {
+        // General
+        public static void Sys_Clone(object nill = null)
+        {
+            Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>().Clone());
+        }
+        public static void SysPanic_ToString(object nill = null)
+        {
+            var ins = Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>();
+            Runtime.Stack.Push($"BasePanic[{ ins["type"].Cast<string>() }: { ins["code"].Cast<int>() }]: { ins["msg"].Cast<string>() }");
+        }
+
+
         // Vec
         public static void SysVec_GetValue(object nill = null)
         {
@@ -28,10 +41,6 @@ namespace RobinVM.Models.BuiltIn
         public static void SysVec_Len(object nill = null)
         {
             Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"].Cast<List<object>>().Count);
-        }
-        public static void SysVec_Clone(object nill = null)
-        {
-            Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>().Clone());
         }
         public static void SysVec_ToString(object nill = null)
         {
@@ -67,10 +76,6 @@ namespace RobinVM.Models.BuiltIn
         {
             Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"].Cast<string>().Length);
         }
-        public static void SysStr_Clone(object nill = null)
-        {
-            Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>().Clone());
-        }
         public static void SysStr_Concat(object nill = null)
         {
             Runtime.Stack.Push(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"].Cast<string>() + Runtime.CurrentFunctionPointer.FindArgument(1).Cast<CacheTable>()["ptr"].Cast<string>());
@@ -86,7 +91,7 @@ namespace RobinVM.Models.BuiltIn
         }
         public static void SysStr_ParseNum(object nill = null)
         {
-            Runtime.Stack.Push(int.Parse(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"].Cast<string>()));
+            Runtime.Stack.Push(float.Parse(Runtime.CurrentFunctionPointer.FindArgument(0).Cast<CacheTable>()["ptr"].Cast<string>()));
         }
     }
 }
@@ -112,8 +117,7 @@ namespace RobinVM.Models
                 Instruction.New(Runtime.LoadFromArgs, 0),
                 Instruction.New(Runtime.CallInstance, "tostr()"),
                 Instruction.New(Runtime.RvmOutput),
-                Instruction.New(Runtime.Stack.Push, '\n'),
-                Instruction.New(Runtime.RvmOutput),
+                Instruction.New(Console.Write, '\n'),
                 Instruction.New(Runtime.Return)
             ));
 
@@ -148,7 +152,21 @@ namespace RobinVM.Models
                                 Instruction.New(Runtime.RvmThrow),
                                 Instruction.New(Runtime.Return)
                             )
-                        }
+                        },
+                        { "tostr()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysPanic_ToString),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "clone()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.Sys_Clone),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
                     })
                 });
 
@@ -160,27 +178,144 @@ namespace RobinVM.Models
                     (
                         Instruction.New(Runtime.Return)
                     ),
-                    CacheTable = new CacheTable(new Dictionary<string, object>()
+                    CacheTable = new CacheTable( new Dictionary<string, object>()
                     {
                         { "$", "str" },
                         { "ptr", null },
                         { "tostr()",
                             Function.New
                             (
-                                Instruction.New(Runtime.LoadFromArgs, 0),
-                                Instruction.New(Runtime.LoadGlobal, "ptr"),
+                                Instruction.New(Extensions.SysStr_ToString),
                                 Instruction.New(Runtime.Return)
                             )
                         },
                         { "tonum()",
                             Function.New
                             (
-                                Instruction.New(Runtime.LoadFromArgs, 0),
-                                Instruction.New(Runtime.LoadGlobal, "ptr"),
-                                Instruction.New(Runtime.Cast<float>),
+                                Instruction.New(Extensions.SysStr_ParseNum),
                                 Instruction.New(Runtime.Return)
                             )
-                        }
+                        },
+                        { "len()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysStr_Len),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "get(.)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysStr_GetValue),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "has(.)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysStr_Find),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "add(.)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysStr_Concat),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "clear()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysStr_Clear),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "clone()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.Sys_Clone),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "addat(..)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysStr_Insert),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                    })
+                });
+
+            // Vec
+            CacheTable.Add("vec",
+                new Obj
+                {
+                    Ctor = Function.New
+                    (
+                        Instruction.New(Runtime.Return)
+                    ),
+                    CacheTable = new CacheTable(new Dictionary<string, object>()
+                    {
+                        { "$", "vec" },
+                        { "ptr", null },
+                        { "tostr()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysVec_ToString),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "len()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysVec_Len),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "get(.)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysVec_GetValue),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "has(.)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysVec_Find),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "add(.)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysVec_Concat),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "clear()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysVec_Clear),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "clone()",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.Sys_Clone),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
+                        { "addat(..)",
+                            Function.New
+                            (
+                                Instruction.New(Extensions.SysStr_Insert),
+                                Instruction.New(Runtime.Return)
+                            )
+                        },
                     })
                 });
         }

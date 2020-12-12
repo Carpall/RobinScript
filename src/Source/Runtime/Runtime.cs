@@ -127,7 +127,7 @@ namespace RobinVM
         public static void LoadNumber(object args)
         {
             var ins = RuntimeImage.FindObj("num").Copy().CacheTable;
-            ins["ptr"] = args.Cast<int>();
+            ins["ptr"] = args;
             Stack.Push(ins);
         }
 
@@ -180,7 +180,7 @@ namespace RobinVM
         {
             if (BasePanic.TryScopeTarget != null)
                 BasePanic.Throw("Can not initialize try environment in the scope of another try environment", 14, "PreRuntime");
-            BasePanic.TryScopeTarget = args;
+            BasePanic.TryScopeTarget = (int)args;
         }
         /// <summary>
         /// Initialize try-panic environment

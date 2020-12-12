@@ -4,7 +4,7 @@ using RobinVM.Models;
 var main = Function.New
 (
     Instruction.New(Runtime.LoadString, "Hello"),
-    Instruction.New(Runtime.RvmOutput),
+    Instruction.New(Runtime.Call, "println"),
     Instruction.New(Runtime.Return)
 );
 

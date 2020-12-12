@@ -4,11 +4,11 @@ using System.Text;
 
 namespace RobinVM.Models
 {
-    public struct CacheTable
+    public class CacheTable
     {
         Dictionary<string, object> Members;
         public CacheTable(Dictionary<string, object> members) => Members = members;
-        public static CacheTable New() => new CacheTable { Members = new Dictionary<string, object>() };
+        public CacheTable() => Members = new Dictionary<string, object>();
         public object this[string id] { get => Members[id]; set => Members[id] = value; }
         public void Set(string id, object value) => Members[id] = value;
         public void Add(string id, object value) => Members.Add(id, value);

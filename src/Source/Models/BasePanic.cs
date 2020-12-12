@@ -5,7 +5,7 @@ namespace RobinVM.Models
 {
     public static class BasePanic
     {
-        public static object TryScopeTarget = null;
+        public static int? TryScopeTarget = null;
         static List<string> Trace = new List<string>();
         public static T Cast<T>(this object self) {
             if (self is not T)
