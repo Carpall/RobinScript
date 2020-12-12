@@ -110,26 +110,10 @@ namespace RobinVM
         }
 
         /// <summary>
-        /// Loads a new string instance with <paramref name="args"/> constant as value
+        /// Loads constant onto the stack
         /// </summary>
         /// <param name="args">String</param>
-        public static void LoadString(object args)
-        {
-            var ins = RuntimeImage.FindObj("str").Copy().CacheTable;
-            ins["ptr"] = args.Cast<string>();
-            Stack.Push(ins);
-        }
-
-        /// <summary>
-        /// Loads a new number instance with <paramref name="args"/> constant as value
-        /// </summary>
-        /// <param name="args">Int8-64, Float32-128</param>
-        public static void LoadNumber(object args)
-        {
-            var ins = RuntimeImage.FindObj("num").Copy().CacheTable;
-            ins["ptr"] = args;
-            Stack.Push(ins);
-        }
+        public static void Load(object args) => Stack.Push(args);
 
         /// <summary>
         /// Loads a new list with all stack elements as start values

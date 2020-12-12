@@ -3,10 +3,12 @@ using RobinVM.Models;
 
 var main = Function.New
 (
-    Instruction.New(Runtime.LoadString, "Hello "),
-    Instruction.New(Runtime.LoadString, "World!"),
-    Instruction.New(Runtime.CallInstance, "add(.)"),
-    Instruction.New(Runtime.Call, "println(.)"),
+    Instruction.New(Runtime.Load, "Hello1"),
+    Instruction.New(Runtime.Load, "Hello2"),
+    Instruction.New(Runtime.Load, "Hello3"),
+    Instruction.New(Runtime.LoadVector, 3),
+    Instruction.New(Runtime.CallInstance, "tostr()"),
+    Instruction.New(Runtime.RvmOutput),
     Instruction.New(Runtime.Return)
 );
 
