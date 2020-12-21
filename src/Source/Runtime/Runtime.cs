@@ -337,6 +337,23 @@ namespace RobinVM
                 ProgramCounter = CurrentFunctionPointer.FindLabel((string)args) - 1;
         }
 
+        /// <summary>
+        /// Pushes OR of two bool onto the stack
+        /// </summary>
+        /// <param name="args">Index of instruction to jump on</param>
+        public static void OR(object args)
+        {
+            Stack.Push(Stack.Pop<bool>() || Stack.Pop<bool>());
+        }
+
+        /// <summary>
+        /// Pushes And of two bool onto the stack
+        /// </summary>
+        /// <param name="args">Index of instruction to jump on</param>
+        public static void And(object args)
+        {
+            Stack.Push(Stack.Pop<bool>() && Stack.Pop<bool>());
+        }
 
         /// <summary>
         /// Pops last element of the stack and jump to <paramref name="args"/> if false
