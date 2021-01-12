@@ -23,11 +23,12 @@ namespace RobinVM.Models
         }
         public void TransferToArguments(ref Function function)
         {
-            if (VirtualStack.Count != 0)
-            {
-                function.PassArguments(VirtualStack.ToArray());
-                VirtualStack.Clear();
-            }
+            var cs = CountStack();
+            var index = cs - function.ParamCount();
+            var count = cs-index;
+            var args = VirtualStack.GetRange(index, count);
+            VirtualStack.RemoveRange(index, count);
+            function.PassArguments(args);
         }
         public object Pop()
         {

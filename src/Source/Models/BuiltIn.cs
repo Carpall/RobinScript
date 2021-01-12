@@ -72,6 +72,7 @@ namespace RobinVM.Models
                 {
                     Ctor = Function.New
                     (
+                        4,
                         Instruction.New(Runtime.LoadFromArgs, 0),
                         Instruction.New(Runtime.LoadFromArgs, 1),
                         Instruction.New(Runtime.StoreGlobal, "msg"),
@@ -92,6 +93,7 @@ namespace RobinVM.Models
                         { "throw()",
                             Function.New
                             (
+                                1,
                                 Instruction.New(Runtime.LoadFromArgs, 0),
                                 Instruction.New(Runtime.RvmThrow),
                                 Instruction.New(Runtime.Return)
@@ -100,6 +102,7 @@ namespace RobinVM.Models
                         { "tostr()",
                             Function.New
                             (
+                                1,
                                 Instruction.New(Extensions.SysPanic_ToString),
                                 Instruction.New(Runtime.Return)
                             )
@@ -107,6 +110,7 @@ namespace RobinVM.Models
                         { "clone()",
                             Function.New
                             (
+                                1,
                                 Instruction.New(Extensions.Sys_Clone),
                                 Instruction.New(Runtime.Return)
                             )
@@ -119,7 +123,7 @@ namespace RobinVM.Models
                 new Obj
                 {
                     Ctor = Function.New
-                    (
+                    (   0,
                         Instruction.New(Runtime.Return)
                     ),
                     CacheTable = new CacheTable(new Dictionary<string, object>()
@@ -129,6 +133,7 @@ namespace RobinVM.Models
                         { "tostr()",
                             Function.New
                             (
+                                1,
                                 Instruction.New(Extensions.SysVec_ToString),
                                 Instruction.New(Runtime.Return)
                             )
@@ -136,6 +141,7 @@ namespace RobinVM.Models
                         { "len()",
                             Function.New
                             (
+                                1,
                                 Instruction.New(Extensions.SysVec_Len),
                                 Instruction.New(Runtime.Return)
                             )
@@ -143,6 +149,7 @@ namespace RobinVM.Models
                         { "get(.)",
                             Function.New
                             (
+                                2,
                                 Instruction.New(Extensions.SysVec_GetValue),
                                 Instruction.New(Runtime.Return)
                             )
@@ -150,6 +157,7 @@ namespace RobinVM.Models
                         { "has(.)",
                             Function.New
                             (
+                                2,
                                 Instruction.New(Extensions.SysVec_Find),
                                 Instruction.New(Runtime.Return)
                             )
@@ -157,6 +165,7 @@ namespace RobinVM.Models
                         { "add(.)",
                             Function.New
                             (
+                                2,
                                 Instruction.New(Extensions.SysVec_Concat),
                                 Instruction.New(Runtime.Return)
                             )
@@ -164,6 +173,7 @@ namespace RobinVM.Models
                         { "clear()",
                             Function.New
                             (
+                                1,
                                 Instruction.New(Extensions.SysVec_Clear),
                                 Instruction.New(Runtime.Return)
                             )
@@ -171,6 +181,7 @@ namespace RobinVM.Models
                         { "clone()",
                             Function.New
                             (
+                                1,
                                 Instruction.New(Extensions.Sys_Clone),
                                 Instruction.New(Runtime.Return)
                             )
@@ -178,6 +189,7 @@ namespace RobinVM.Models
                         { "addat(..)",
                             Function.New
                             (
+                                3,
                                 Instruction.New(Extensions.SysVec_Insert),
                                 Instruction.New(Runtime.Return)
                             )

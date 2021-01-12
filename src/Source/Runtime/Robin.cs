@@ -1,5 +1,6 @@
 ﻿using RobinVM.Models;
 using System;
+using System.Collections.Generic;
 
 namespace RobinVM
 {
@@ -32,6 +33,8 @@ namespace RobinVM
             var x1 = Runtime.ProgramCounter;
             BasePanic.LoadTrail(trail);
             Runtime.Stack.TransferToArguments(ref function);
+            var x3 = Runtime.Stack;
+            Runtime.Stack = new RStack(1000);
             Runtime.CurrentFunctionPointer = function;
             if (Runtime.StorageManager != 0)
             {
@@ -53,6 +56,7 @@ namespace RobinVM
                 if (Runtime.StorageManager != 0)
                     Array.Clear(Runtime.Storage, byte.MinValue, byte.MaxValue);
             }
+            Runtime.Stack = x3;
             BasePanic.UnloadTrail();
             Runtime.ProgramCounter = x1;
         }

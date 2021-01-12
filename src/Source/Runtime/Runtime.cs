@@ -13,7 +13,7 @@ namespace RobinVM
         public static int ProgramCounter = 0;
         public static Image RuntimeImage;
         public static Function CurrentFunctionPointer;
-        public static readonly RStack Stack = new RStack(600000);
+        public static RStack Stack = new RStack(1000);
 
         /// <summary>
         /// Matches if stack pop type is the same of <typeparamref name="T"/>

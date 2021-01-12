@@ -8,46 +8,52 @@ namespace RobinVM.Models
 {
     public struct Function
     {
-        public static Function New(params Instruction[] instructions) => new Function(instructions);
-        public Function(Instruction[] instructions)
+        public static Function New(int paramCount, params Instruction[] instructions) => new Function(instructions, paramCount);
+        public Function(Instruction[] instructions, int paramCount)
         {
             Instructions = instructions;
-            Arguments = null;
-            Labels = new Dictionary<string, int>();
+            _arguments = null;
+            _labels = new Dictionary<string, int>();
+            _paramCount = paramCount;
         }
         public void AddLabel(string label, int instructionIndex)
         {
-            if (!Labels.TryAdd(label, instructionIndex))
-                BasePanic.Throw($"Already define label `{label}` as {Labels[label]}: `{Instructions[Labels[label]].FunctionPointer.Method.Name}`", 2, "PreRuntime");
+            if (!_labels.TryAdd(label, instructionIndex))
+                BasePanic.Throw($"Already define label `{label}` as {_labels[label]}: `{Instructions[_labels[label]].FunctionPointer.Method.Name}`", 2, "PreRuntime");
         }
         public int FindLabel(string label)
         {
-            if (Labels.TryGetValue(label, out int ret))
+            if (_labels.TryGetValue(label, out int ret))
                 return ret;
             BasePanic.Throw($"Undefine label `{label}`", 3, "Runtime");
             return 0;
         }
         public bool UninstantiatedLabels()
         {
-            return Labels == null;
+            return _labels == null;
         }
         public object FindArgument(byte index)
         {
-            if (Arguments is null)
+            if (_arguments is null)
                 BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", 4, "Runtime");
             if (index < 0)
                 BasePanic.Throw("Can not index function argument with a negative index", 5, "Runtime");
-            if (index < Arguments.Length)
-                return Arguments[index];
+            if (index < _arguments.Count)
+                return _arguments[index];
             BasePanic.Throw($"Insufficient function arguments, have not been passed {index+1} argument/s", 6, "Runtime");
             return null;
         }
-        public void PassArguments(object[] arguments)
+        public void PassArguments(List<object> arguments)
         {
-            Arguments = arguments;
+            _arguments = arguments;
         }
-        Dictionary<string, int> Labels;
-        object[] Arguments;
+        public int ParamCount()
+        {
+            return _paramCount;
+        }
+        int _paramCount;
+        Dictionary<string, int> _labels;
+        List<object> _arguments;
         public Instruction[] Instructions;
     }
 }
