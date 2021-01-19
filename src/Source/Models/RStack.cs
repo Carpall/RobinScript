@@ -33,7 +33,7 @@ namespace RobinVM.Models
         public object Pop()
         {
             if (VirtualStack.Count == 0)
-                BasePanic.Throw("Tryed to pop element from empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 13, "Runtime");
+                BasePanic.Throw("Empty stack", 13, "Runtime");
             var x0 = VirtualStack[^1];
             VirtualStack.RemoveAt(VirtualStack.Count - 1);
             return x0;
@@ -41,7 +41,7 @@ namespace RobinVM.Models
         public T Pop<T>()
         {
             if (VirtualStack.Count == 0)
-                BasePanic.Throw("Tryed to pop element from empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 12, "Runtime");
+                BasePanic.Throw("Empty stack", 12, "Runtime");
             var x0 = VirtualStack[^1];
             VirtualStack.RemoveAt(VirtualStack.Count - 1);
             return x0.Cast<T>();
@@ -49,14 +49,14 @@ namespace RobinVM.Models
         public T Peek<T>(byte skip)
         {
             if (VirtualStack.Count < skip)
-                BasePanic.Throw("Tryed to peekskip element from short stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 12, "Runtime");
+                BasePanic.Throw("Empty stack", 12, "Runtime");
             var x0 = VirtualStack[^skip];
             return x0.Cast<T>();
         }
         public T PrePop<T>()
         {
             if (VirtualStack.Count == 0)
-                BasePanic.Throw("Tryed to pop element from empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 12, "Runtime");
+                BasePanic.Throw("Empty stack", 12, "Runtime");
             var x0 = VirtualStack[0];
             VirtualStack.RemoveAt(0);
             return x0.Cast<T>();
@@ -64,31 +64,31 @@ namespace RobinVM.Models
         public object Peek()
         {
             if (VirtualStack.Count == 0)
-                BasePanic.Throw("Tryed to peek the value of element on empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 17, "Runtime");
+                BasePanic.Throw("Empty stack", 17, "Runtime");
             return VirtualStack[^1];
         }
         public T PrePeek<T>()
         {
             if (VirtualStack.Count == 0)
-                BasePanic.Throw("Tryed to peek the value at the base of empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 11, "Runtime");
+                BasePanic.Throw("Empty stack", 11, "Runtime");
             return VirtualStack[0].Cast<T>();
         }
         public void Push(object value)
         {
             if (VirtualStack.Count == 16)
-                BasePanic.Throw("Tryed to push element onto full stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 10, "Runtime");
+                BasePanic.Throw("Empty stack", 10, "Runtime");
             VirtualStack.Add(value);
         }
         public void PrePush(object value)
         {
             if (VirtualStack.Count == 16)
-                BasePanic.Throw("Tryed to put element at the base of full stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 9, "Runtime");
+                BasePanic.Throw("Empty stack", 9, "Runtime");
             VirtualStack.Insert(0, value);
         }
         public void PopNR()
         {
             if (VirtualStack.Count == 0)
-                BasePanic.Throw("Tryed to pop element from empty stack, use Runtime.Stack.DrawStack function at runtime to debug the stack container", 8, "Runtime");
+                BasePanic.Throw("Empty stack", 8, "Runtime");
             VirtualStack.RemoveAt(VirtualStack.Count - 1);
         }
         public void Clear()

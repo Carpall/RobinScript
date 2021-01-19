@@ -9,7 +9,21 @@ namespace RobinVM.Models
         Dictionary<string, object> Members;
         public CacheTable(Dictionary<string, object> members) => Members = members;
         public CacheTable() => Members = new Dictionary<string, object>();
-        public object this[string id] { get => Members[id]; set => Members[id] = value; }
+        public object this[string id]
+        {
+            get
+            {
+                if (!Members.ContainsKey(id))
+                    BasePanic.Throw("Undefined member `"+id+'`', 45, "Runtime");
+                return Members[id];
+            }
+            set
+            {
+                if (!Members.ContainsKey(id))
+                    Members.Add(id, value);
+                Members[id] = value;
+            }
+        }
         public void Set(string id, object value) => Members[id] = value;
         public void Add(string id, object value) => Members.Add(id, value);
         public bool TryAdd(string id, object value) => Members.TryAdd(id, value);

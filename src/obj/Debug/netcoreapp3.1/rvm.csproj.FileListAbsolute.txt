@@ -1,0 +1,13 @@
+C:\Users\Mondelli\Desktop\rvm\src\obj\Debug\netcoreapp3.1\rvm.AssemblyInfoInputs.cache
+C:\Users\Mondelli\Desktop\rvm\src\obj\Debug\netcoreapp3.1\rvm.AssemblyInfo.cs
+C:\Users\Mondelli\Desktop\rvm\src\obj\Debug\netcoreapp3.1\rvm.csproj.CoreCompileInputs.cache
+C:\Users\Mondelli\Desktop\rvm\src\bin\Debug\netcoreapp3.1\RobinVM.exe
+C:\Users\Mondelli\Desktop\rvm\src\bin\Debug\netcoreapp3.1\RobinVM.deps.json
+C:\Users\Mondelli\Desktop\rvm\src\bin\Debug\netcoreapp3.1\RobinVM.runtimeconfig.json
+C:\Users\Mondelli\Desktop\rvm\src\bin\Debug\netcoreapp3.1\RobinVM.runtimeconfig.dev.json
+C:\Users\Mondelli\Desktop\rvm\src\bin\Debug\netcoreapp3.1\RobinVM.dll
+C:\Users\Mondelli\Desktop\rvm\src\bin\Debug\netcoreapp3.1\RobinVM.pdb
+C:\Users\Mondelli\Desktop\rvm\src\obj\Debug\netcoreapp3.1\RobinVM.dll
+C:\Users\Mondelli\Desktop\rvm\src\obj\Debug\netcoreapp3.1\RobinVM.pdb
+C:\Users\Mondelli\Desktop\rvm\src\obj\Debug\netcoreapp3.1\rvm.genruntimeconfig.cache
+C:\Users\Mondelli\Desktop\rvm\src\obj\Debug\netcoreapp3.1\rvm.csprojAssemblyReference.cache
